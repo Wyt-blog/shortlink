@@ -59,6 +59,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                     throw new ClientException(UserErrorCodeEnum.USER_SAVE_ERROR);
                 }
                 userRegisterCachePenetrationBloomFilter.add(requestParm.getUsername());
+                return;
             }
             // 获取锁失败（不重试直接报错返回）
             throw new ClientException(UserErrorCodeEnum.USER_NAME_EXITS);
