@@ -2,7 +2,10 @@ package com.nageoffer.shortlink.admin.controller;
 
 import com.nageoffer.shortlink.admin.common.convention.result.Result;
 import com.nageoffer.shortlink.admin.common.convention.result.Results;
+import com.nageoffer.shortlink.admin.dto.req.UserLoginReqDTO;
 import com.nageoffer.shortlink.admin.dto.req.UserRegisterReqDTO;
+import com.nageoffer.shortlink.admin.dto.req.UserUpdateReqDTO;
+import com.nageoffer.shortlink.admin.dto.resp.UserLoginRespDTO;
 import com.nageoffer.shortlink.admin.dto.resp.UserRespDTO;
 import com.nageoffer.shortlink.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -32,11 +35,44 @@ public class UserController {
         return Results.success(userService.hasUsername(username));
     }
 
+    /**
+     * 用户注册
+     */
     @PostMapping
     public Result<Void> register(@RequestBody UserRegisterReqDTO requestParm){
         userService.register(requestParm);
         return Results.success();
     }
 
+    /**
+     * 根据用户名修改用户信息
+     */
+    @PutMapping
+    public Result<Void> update(@RequestBody UserUpdateReqDTO requestParm){
+        userService.update(requestParm);
+        return Results.success();
+    }
+
+    /**
+     * 用户登录
+     */
+    @PostMapping("login")
+    public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO requestParm){
+        return Results.success(userService.login(requestParm));
+    }
+
+    /**
+     * 检查用户是否登录
+     */
+    @GetMapping("check-login")
+    public Result<Boolean> checkLogin(@RequestParam("username") String username,@RequestParam("token") String token){
+        return Results.success(userService.checkLogin(username,token));
+    }
+
+    @DeleteMapping("logout")
+    public Result<Void> logout(@RequestParam("username") String username,@RequestParam("token") String token){
+        userService.logout(username,token);
+        return Results.success();
+    }
 
 }
