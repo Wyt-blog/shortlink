@@ -11,6 +11,9 @@ import com.nageoffer.shortlink.admin.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 用户管理控制层
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/short-link/admin/v1/user")
@@ -69,6 +72,9 @@ public class UserController {
         return Results.success(userService.checkLogin(username,token));
     }
 
+    /**
+     * 用户退出登录
+     */
     @DeleteMapping("logout")
     public Result<Void> logout(@RequestParam("username") String username,@RequestParam("token") String token){
         userService.logout(username,token);

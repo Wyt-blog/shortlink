@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * 用户接口实现层
  */
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements UserService {

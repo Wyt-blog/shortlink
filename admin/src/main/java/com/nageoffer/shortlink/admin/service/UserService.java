@@ -9,6 +9,9 @@ import com.nageoffer.shortlink.admin.dto.resp.UserLoginRespDTO;
 import com.nageoffer.shortlink.admin.dto.resp.UserRespDTO;
 import org.springframework.web.bind.annotation.RequestBody;
 
+/**
+ * 用户管理接口
+ */
 public interface UserService extends IService<UserDO> {
 
     /**
