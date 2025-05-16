@@ -42,8 +42,8 @@ public class UserController {
      * 用户注册
      */
     @PostMapping
-    public Result<Void> register(@RequestBody UserRegisterReqDTO requestParm){
-        userService.register(requestParm);
+    public Result<Void> register(@RequestBody UserRegisterReqDTO requestParam){
+        userService.register(requestParam);
         return Results.success();
     }
 
@@ -51,8 +51,8 @@ public class UserController {
      * 根据用户名修改用户信息
      */
     @PutMapping
-    public Result<Void> update(@RequestBody UserUpdateReqDTO requestParm){
-        userService.update(requestParm);
+    public Result<Void> update(@RequestBody UserUpdateReqDTO requestParam){
+        userService.update(requestParam);
         return Results.success();
     }
 
@@ -60,8 +60,8 @@ public class UserController {
      * 用户登录
      */
     @PostMapping("login")
-    public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO requestParm){
-        return Results.success(userService.login(requestParm));
+    public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO requestParam){
+        return Results.success(userService.login(requestParam));
     }
 
     /**

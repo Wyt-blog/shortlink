@@ -21,6 +21,13 @@ public interface GroupService extends IService<GroupDO> {
     void saveGroup(String groupName);
 
     /**
+     * 新增分组接口
+     * @param username 用户名
+     * @param groupName 新增分组名
+     */
+    void saveGroup(String username, String groupName);
+
+    /**
      * 查询短连接分组
      *
      * @return 短连接分组结合
@@ -30,9 +37,9 @@ public interface GroupService extends IService<GroupDO> {
     /**
      * 修改分组名接口
      *
-     * @param requestParm 修改分组名参数
+     * @param requestParam 修改分组名参数
      */
-    void updateGroup(ShortLinkGroupUpdateReqDTO requestParm);
+    void updateGroup(ShortLinkGroupUpdateReqDTO requestParam);
 
     /**
      * 删除分组接口
@@ -44,7 +51,7 @@ public interface GroupService extends IService<GroupDO> {
     /**
      * 短连接分组排序
      *
-     * @param requestParm 排序字段参数实体
+     * @param requestParam 排序字段参数实体
      */
-    void sortGroup(List<ShortLinkGroupSortReqDTO> requestParm);
+    void sortGroup(List<ShortLinkGroupSortReqDTO> requestParam);
 }

@@ -6,17 +6,23 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.nageoffer.shortlink.admin.common.biz.user.UserContext;
+import com.nageoffer.shortlink.admin.common.convention.result.Result;
 import com.nageoffer.shortlink.admin.dao.entity.GroupDO;
 import com.nageoffer.shortlink.admin.dao.mapper.GroupMapper;
 import com.nageoffer.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
 import com.nageoffer.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import com.nageoffer.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
+import com.nageoffer.shortlink.admin.remote.dto.ShortLinkRemoteService;
+import com.nageoffer.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.nageoffer.shortlink.admin.service.GroupService;
 import com.nageoffer.shortlink.admin.toolkit.RandomCodeGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 短连接分组接口实现
@@ -25,17 +31,24 @@ import java.util.List;
 @Slf4j
 public class GroupServiceImpl extends ServiceImpl<GroupMapper,GroupDO> implements GroupService {
 
+    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService(){};
+
     @Override
     public void saveGroup(String groupName) {
+        saveGroup(UserContext.getUsername(), groupName);
+    }
+
+    @Override
+    public void saveGroup(String username, String groupName) {
         String gid;
         while (true) {
             gid = RandomCodeGenerator.generateRandomCode();
-            if (hasGroup(gid)) break;
+            if (hasGroup(username,gid)) break;
         }
         GroupDO groupDO = GroupDO.builder()
                 .gid(gid)
                 .name(groupName)
-                .username(UserContext.getUsername())
+                .username(username)
                 .sortOrder(0)
                 .build();
         baseMapper.insert(groupDO);
@@ -48,16 +61,23 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper,GroupDO> implement
                 .eq(GroupDO::getUsername, UserContext.getUsername())
                 .orderByDesc(GroupDO::getSortOrder, GroupDO::getUpdateTime);
         List<GroupDO> groupDOS = baseMapper.selectList(wrapper);
-        return BeanUtil.copyToList(groupDOS, ShortLinkGroupRespDTO.class);
+        List<String> gids = groupDOS.stream().map(GroupDO::getGid).toList();
+        List<ShortLinkGroupRespDTO> shortLinkGroupRespDTOS = BeanUtil.copyToList(groupDOS, ShortLinkGroupRespDTO.class);
+        Result<List<ShortLinkGroupCountQueryRespDTO>> respDTOResult = shortLinkRemoteService.listGroupShortLinkCount(gids);
+        Map<String, Long> map = respDTOResult.getData().stream().collect(Collectors.toMap(ShortLinkGroupCountQueryRespDTO::getGid, ShortLinkGroupCountQueryRespDTO::getShortLinkCount));
+        shortLinkGroupRespDTOS.forEach(shortLinkGroupRespDTO -> {
+            shortLinkGroupRespDTO.setShortLinkCount(map.get(shortLinkGroupRespDTO.getGid()));
+        });
+        return shortLinkGroupRespDTOS;
     }
 
     @Override
-    public void updateGroup(ShortLinkGroupUpdateReqDTO requestParm) {
+    public void updateGroup(ShortLinkGroupUpdateReqDTO requestParam) {
         this.lambdaUpdate()
-                .eq(GroupDO::getGid,requestParm.getGid())
+                .eq(GroupDO::getGid,requestParam.getGid())
                 .eq(GroupDO::getUsername,UserContext.getUsername())
                 .eq(GroupDO::getDelFlag,0)
-                .set(GroupDO::getName,requestParm.getName())
+                .set(GroupDO::getName,requestParam.getName())
                 .update();
     }
 
@@ -72,8 +92,8 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper,GroupDO> implement
     }
 
     @Override
-    public void sortGroup(List<ShortLinkGroupSortReqDTO> requestParm) {
-        requestParm.forEach(each -> {
+    public void sortGroup(List<ShortLinkGroupSortReqDTO> requestParam) {
+        requestParam.forEach(each -> {
             GroupDO groupDO = GroupDO.builder()
                     .sortOrder(each.getSortOrder())
                     .build();
@@ -84,11 +104,11 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper,GroupDO> implement
         });
     }
 
-    public boolean hasGroup(String gid) {
+    public boolean hasGroup(String username,String gid) {
         GroupDO hasGroup = baseMapper.selectOne(
                 new QueryWrapper<GroupDO>().lambda()
                         .eq(GroupDO::getGid, gid)
-                        .eq(GroupDO::getUsername, null)
+                        .eq(GroupDO::getUsername, Optional.ofNullable(username).orElse(UserContext.getUsername()))
         );
         return hasGroup == null;
     }

@@ -33,24 +33,24 @@ public interface UserService extends IService<UserDO> {
     /**
      * 用户注册
      *
-     * @param requestParm 用户注册实体类（用户名，密码，手机号......）
+     * @param requestParam 用户注册实体类（用户名，密码，手机号......）
      */
-    void register(UserRegisterReqDTO requestParm);
+    void register(UserRegisterReqDTO requestParam);
 
     /**
      * 修改用户信息
      *
-     * @param requestParm 用户信息修改实体类
+     * @param requestParam 用户信息修改实体类
      */
-    void update(@RequestBody UserUpdateReqDTO requestParm);
+    void update(@RequestBody UserUpdateReqDTO requestParam);
 
     /**
      * 用户登录
      *
-     * @param requestParm 用户登录请求参数
+     * @param requestParam 用户登录请求参数
      * @return 用户登录返回参数
      */
-    UserLoginRespDTO login(UserLoginReqDTO requestParm);
+    UserLoginRespDTO login(UserLoginReqDTO requestParam);
 
     /**
      * 检查用户是否登录

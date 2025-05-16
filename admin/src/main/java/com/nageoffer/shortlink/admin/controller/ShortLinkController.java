@@ -21,16 +21,16 @@ public class ShortLinkController {
      * 分页查询短连接
      */
     @GetMapping("page")
-    public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParm) {
-        return shortLinkRemoteService.pageShortLink(requestParm);
+    public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam) {
+        return shortLinkRemoteService.pageShortLink(requestParam);
     }
 
     /**
      * 新增短连接
      */
     @PostMapping("/create")
-    public Result<ShortLinkCreatRespDTO> createShortLink(@RequestBody ShortLinkCreatReqDTO requestParm) {
-        return shortLinkRemoteService.createShortLink(requestParm);
+    public Result<ShortLinkCreatRespDTO> createShortLink(@RequestBody ShortLinkCreatReqDTO requestParam) {
+        return shortLinkRemoteService.createShortLink(requestParam);
     }
 
 }
