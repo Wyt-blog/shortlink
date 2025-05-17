@@ -5,6 +5,7 @@ import com.nageoffer.shortlink.project.common.convention.result.Result;
 import com.nageoffer.shortlink.project.common.convention.result.Results;
 import com.nageoffer.shortlink.project.dto.req.ShortLinkCreatReqDTO;
 import com.nageoffer.shortlink.project.dto.req.ShortLinkPageReqDTO;
+import com.nageoffer.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
 import com.nageoffer.shortlink.project.dto.resp.ShortLinkCreatRespDTO;
 import com.nageoffer.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.nageoffer.shortlink.project.dto.resp.ShortLinkPageRespDTO;
@@ -33,6 +34,16 @@ public class ShortLinkController {
     }
 
     /**
+     * 修改短连接
+     */
+    // TODO 有 bug
+//    @PutMapping("/update")
+    public Result<Void> updateShortLink(@RequestBody ShortLinkUpdateReqDTO requestParam) {
+        shortLinkService.updateShortLink(requestParam);
+        return Results.success();
+    }
+
+    /**
      * 分页查询短连接
      */
     @GetMapping("page")
@@ -40,6 +51,9 @@ public class ShortLinkController {
         return Results.success(shortLinkService.pageShortLink(requestParam));
     }
 
+    /**
+     * 查询短连接geshu
+     */
     @GetMapping("count")
     public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam){
         return Results.success(shortLinkService.listGroupShortLinkCount(requestParam));
