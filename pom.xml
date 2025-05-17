@@ -31,6 +31,7 @@
         <hutool-all.version>5.7.17</hutool-all.version>
         <redisson.version>3.21.3</redisson.version>
         <guava.version>30.1-jre</guava.version>
+        <jsoup.version>1.17.2</jsoup.version>
     </properties>
 
     <dependencies>
@@ -48,6 +49,12 @@
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${jsoup.version}</version>
             </dependency>
 
             <dependency>
