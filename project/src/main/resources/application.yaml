@@ -14,3 +14,10 @@ spring:
     redis:
       host: 192.168.200.200
       port: 6379
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: delFlag
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: auto

@@ -5,8 +5,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.nageoffer.shortlink.admin.common.convention.result.Result;
-import com.nageoffer.shortlink.admin.remote.dto.req.ShortLinkCreatReqDTO;
-import com.nageoffer.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import com.nageoffer.shortlink.admin.remote.dto.req.*;
 import com.nageoffer.shortlink.admin.remote.dto.resp.ShortLinkCreatRespDTO;
 import com.nageoffer.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.nageoffer.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
@@ -25,6 +24,14 @@ public interface ShortLinkRemoteService {
     /**
      * 创建短连接远程调用
      */
+    default Result<ShortLinkCreatRespDTO> createShortLink(ShortLinkCreatReqDTO requestParam){
+        String result = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/create", JSON.toJSONString(requestParam));
+        return JSON.parseObject(result, new TypeReference<>() {});
+    }
+
+    /**
+     * 分页查询短连接
+     */
     default Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam) {
         Map<String,Object> requestMap = new HashMap<>();
         requestMap.put("gid",requestParam.getGid());
@@ -32,14 +39,6 @@ public interface ShortLinkRemoteService {
         requestMap.put("size",requestParam.getSize());
         String resultPageStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/page", requestMap);
         return JSON.parseObject(resultPageStr, new TypeReference<>() {});
-    }
-
-    /**
-     * 分页查询短连接远程调用
-     */
-    default Result<ShortLinkCreatRespDTO> createShortLink(ShortLinkCreatReqDTO requestParam){
-        String result = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/create", JSON.toJSONString(requestParam));
-        return JSON.parseObject(result, new TypeReference<>() {});
     }
 
     /**
@@ -58,5 +57,41 @@ public interface ShortLinkRemoteService {
     default Result<String> getTitleByUrl(String url) {
         String resultStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/title?url=" + url);
         return JSON.parseObject(resultStr, new TypeReference<>() {});
+    }
+
+    /**
+     * 将制定短连接移动至回收站
+     */
+    default Result<Void> saveRecycleBin(RecycleBinSaveReqDTO requestParam){
+        String result = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/save", JSON.toJSONString(requestParam));
+        return JSON.parseObject(result, new TypeReference<>() {});
+    }
+
+    /**
+     * 分页查询回收站短连接
+     */
+    default Result<IPage<ShortLinkPageRespDTO>> pageRecycleBin(RecycleBinPageReqDTO requestParam){
+        Map<String,Object> requestMap = new HashMap<>();
+        requestMap.put("gids",requestParam.getGids());
+        requestMap.put("current",requestParam.getCurrent());
+        requestMap.put("size",requestParam.getSize());
+        String resultPageStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/page", requestMap);
+        return JSON.parseObject(resultPageStr, new TypeReference<>() {});
+    }
+
+    /**
+     * 从回收站恢复短连接
+     */
+    default Result<Void> recoverRecycleBin(RecycleBinRecoverReqDTO requestParam){
+        String result = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/recover", JSON.toJSONString(requestParam));
+        return JSON.parseObject(result, new TypeReference<>() {});
+    }
+
+    /**
+     * 删除短连接（软删除）
+     */
+    default Result<Void> removeRecycleBin(RecycleBinRemoveReqDTO requestParam){
+        String result = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/remove", JSON.toJSONString(requestParam));
+        return JSON.parseObject(result, new TypeReference<>() {});
     }
 }

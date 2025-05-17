@@ -18,7 +18,7 @@ public class UrlTitleController {
 
     ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService(){};
 
-    @GetMapping("/api/short-link/admin/title")
+    @GetMapping("/api/short-link/admin/v1/title")
     public Result<String> getTitleByUrl(@RequestParam("url") String url) throws IOException {
         return shortLinkRemoteService.getTitleByUrl(url);
     }
