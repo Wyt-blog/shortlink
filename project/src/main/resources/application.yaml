@@ -21,3 +21,7 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
       id-type: auto
+shortlink:
+  state:
+    locale:
+        key: d2ed0942a4c876a4d7bf8b666586d2e4
