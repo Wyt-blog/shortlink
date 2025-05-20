@@ -1,17 +1,14 @@
 package com.nageoffer.shortlink.admin.remote.dto;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.nageoffer.shortlink.admin.common.convention.result.Result;
 import com.nageoffer.shortlink.admin.remote.dto.req.*;
-import com.nageoffer.shortlink.admin.remote.dto.resp.ShortLinkCreatRespDTO;
-import com.nageoffer.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
-import com.nageoffer.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
-import org.springframework.web.bind.annotation.RequestParam;
+import com.nageoffer.shortlink.admin.remote.dto.resp.*;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +32,7 @@ public interface ShortLinkRemoteService {
     default Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam) {
         Map<String,Object> requestMap = new HashMap<>();
         requestMap.put("gid",requestParam.getGid());
+        requestMap.put("orderTag", requestParam.getOrderTag());
         requestMap.put("current",requestParam.getCurrent());
         requestMap.put("size",requestParam.getSize());
         String resultPageStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/page", requestMap);
@@ -93,5 +91,51 @@ public interface ShortLinkRemoteService {
     default Result<Void> removeRecycleBin(RecycleBinRemoveReqDTO requestParam){
         String result = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/remove", JSON.toJSONString(requestParam));
         return JSON.parseObject(result, new TypeReference<>() {});
+    }
+
+    /**
+     * 获取单个短连接
+     */
+    default Result<ShortLinkStatsRespDTO> shortLinkStats(ShortLinkStatsReqDTO requestParam) {
+        Map<String,Object> requestMap = new HashMap<>();
+        requestMap.put("gid",requestParam.getGid());
+        requestMap.put("fullShortUrl",requestParam.getFullShortUrl());
+        requestMap.put("startDate",requestParam.getStartDate());
+        requestMap.put("endDate",requestParam.getEndDate());
+        String resultPageStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats", requestMap);
+        return JSON.parseObject(resultPageStr, new TypeReference<>() {});
+    }
+
+    /**
+     * 访问单个短链接指定时间内监控访问记录数据
+     */
+    default Result<IPage<ShortLinkStatsAccessRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessReqDTO requestParam) {
+        Map<String, Object> stringObjectMap = BeanUtil.beanToMap(requestParam, false, true);
+        stringObjectMap.remove("orders");
+        stringObjectMap.remove("records");
+        String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats/access-record", stringObjectMap);
+        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * 访问分组短链接指定时间内监控数据
+     */
+    default Result<ShortLinkStatsRespDTO> groupShortLinkStats(ShortLinkGroupStatsReqDTO requestParam) {
+        String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats/group", BeanUtil.beanToMap(requestParam));
+        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * 访问分组短链接指定时间内监控访问记录数据
+     */
+    default Result<IPage<ShortLinkStatsAccessRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        Map<String, Object> stringObjectMap = BeanUtil.beanToMap(requestParam, false, true);
+        stringObjectMap.remove("orders");
+        stringObjectMap.remove("records");
+        String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats/access-record/group", stringObjectMap);
+        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
+        });
     }
 }

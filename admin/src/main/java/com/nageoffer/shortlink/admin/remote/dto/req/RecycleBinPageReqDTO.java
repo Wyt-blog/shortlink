@@ -13,6 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 public class RecycleBinPageReqDTO extends Page{
 
+    /**
+     * gid集合
+     */
     private List<String> gids;
 
 }

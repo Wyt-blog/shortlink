@@ -42,6 +42,36 @@ public class ShortLinkPageRespDTO {
     private String originUrl;
 
     /**
+     * 历史 pv
+     */
+    private Integer totalPv;
+
+    /**
+     * 历史 Uip
+     */
+    private Integer totalUip;
+
+    /**
+     * 历史 Uv
+     */
+    private Integer totalUv;
+
+    /**
+     * 当天 pv
+     */
+    private Integer todayPv;
+
+    /**
+     * 当天 Uip
+     */
+    private Integer todayUip;
+
+    /**
+     * 当天 Uv
+     */
+    private Integer todayUv;
+
+    /**
      * 点击量
      */
     private Integer clickNum;

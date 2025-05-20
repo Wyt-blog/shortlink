@@ -67,6 +67,21 @@ public class ShortLinkDO extends BaseDo implements Serializable{
     private Integer validDateType;
 
     /**
+     * 历史 pv
+     */
+    private Integer totalPv;
+
+    /**
+     * 历史 Uip
+     */
+    private Integer totalUip;
+
+    /**
+     * 历史 Uv
+     */
+    private Integer totalUv;
+
+    /**
      * 有效期
      */
     private Date validDate;
@@ -81,4 +96,22 @@ public class ShortLinkDO extends BaseDo implements Serializable{
      */
     @TableField("`describe`")
     private String describe;
+
+    /**
+     * 今日PV
+     */
+    @TableField(exist = false)
+    private Integer todayPv;
+
+    /**
+     * 今日UV
+     */
+    @TableField(exist = false)
+    private Integer todayUv;
+
+    /**
+     * 今日UIP
+     */
+    @TableField(exist = false)
+    private Integer todayUip;
 }

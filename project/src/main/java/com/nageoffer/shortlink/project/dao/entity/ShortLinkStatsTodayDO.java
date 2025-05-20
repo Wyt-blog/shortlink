@@ -1,6 +1,5 @@
 package com.nageoffer.shortlink.project.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.nageoffer.shortlink.project.common.database.BaseDo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,23 +8,15 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
-
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("t_link_browser_stats")
-public class ShortLinkBrowserStats extends BaseDo {
-
+@Builder
+public class ShortLinkStatsTodayDO extends BaseDo {
     /**
-     * ID
-     */
-    private Long id;
-
-    /**
-    * 完整短链接
+    * ID
     */
-    private String fullShortUrl;
+    private Long id;
 
     /**
     * 分组标识
@@ -33,17 +24,27 @@ public class ShortLinkBrowserStats extends BaseDo {
     private String gid;
 
     /**
+    * 短链接
+    */
+    private String fullShortUrl;
+
+    /**
     * 日期
     */
     private Date date;
 
     /**
-    * 访问量
+    * 今日PV
     */
-    private Integer cnt;
+    private Integer todayPv;
 
     /**
-    * 浏览器
+    * 今日UV
     */
-    private String browser;
+    private Integer todayUv;
+
+    /**
+    * 今日IP数
+    */
+    private Integer todayUip;
 }
