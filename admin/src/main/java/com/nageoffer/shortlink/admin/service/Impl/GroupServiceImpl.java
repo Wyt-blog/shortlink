@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.nageoffer.shortlink.admin.common.biz.user.UserContext;
+import com.nageoffer.shortlink.admin.common.constants.RedisCacheConstants;
+import com.nageoffer.shortlink.admin.common.convention.exception.ServiceException;
 import com.nageoffer.shortlink.admin.common.convention.result.Result;
 import com.nageoffer.shortlink.admin.dao.entity.GroupDO;
 import com.nageoffer.shortlink.admin.dao.mapper.GroupMapper;
@@ -16,7 +18,11 @@ import com.nageoffer.shortlink.admin.remote.dto.ShortLinkRemoteService;
 import com.nageoffer.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.nageoffer.shortlink.admin.service.GroupService;
 import com.nageoffer.shortlink.admin.toolkit.RandomCodeGenerator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,9 +35,15 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class GroupServiceImpl extends ServiceImpl<GroupMapper,GroupDO> implements GroupService {
 
     ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService(){};
+
+    final RedissonClient redisson;
+
+    @Value("${shortlink.group.create.max}")
+    private int groupCreateMax;
 
     @Override
     public void saveGroup(String groupName) {
@@ -40,18 +52,31 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper,GroupDO> implement
 
     @Override
     public void saveGroup(String username, String groupName) {
-        String gid;
-        while (true) {
-            gid = RandomCodeGenerator.generateRandomCode();
-            if (hasGroup(username,gid)) break;
+        RLock lock = redisson.getLock(RedisCacheConstants.LOCK_GROUP_CREATE_KEY + username);
+        lock.lock();
+        try {
+            String gid;
+            LambdaQueryWrapper<GroupDO> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(GroupDO::getUsername, username)
+                    .eq(GroupDO::getDelFlag,0);
+            long count = this.count(queryWrapper);
+            if (count > groupCreateMax) {
+                throw new ServiceException(String.format("分组已超过最大分组数:%S",groupCreateMax));
+            }
+            while (true) {
+                gid = RandomCodeGenerator.generateRandomCode();
+                if (hasGroup(username,gid)) break;
+            }
+            GroupDO groupDO = GroupDO.builder()
+                    .gid(gid)
+                    .name(groupName)
+                    .username(username)
+                    .sortOrder(0)
+                    .build();
+            baseMapper.insert(groupDO);
+        }finally {
+
         }
-        GroupDO groupDO = GroupDO.builder()
-                .gid(gid)
-                .name(groupName)
-                .username(username)
-                .sortOrder(0)
-                .build();
-        baseMapper.insert(groupDO);
     }
 
     @Override

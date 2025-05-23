@@ -10,7 +10,6 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import java.io.IOException;
 import java.io.PrintWriter;

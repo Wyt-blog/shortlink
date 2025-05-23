@@ -66,8 +66,7 @@ public interface ShortLinkAccessLogsMapper extends BaseMapper<ShortLinkAccessLog
             "WHERE " +
             "    gid = #{param.gid} " +
             "    AND create_time BETWEEN #{param.startDate} and #{param.endDate} " +
-            "GROUP BY " +
-            "    gid;")
+            "GROUP BY gid;")
     ShortLinkAccessStatsDO findPvUvUidStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
 
     @Select("<script> " +

@@ -7,4 +7,6 @@ public interface RedisCacheConstants {
 
     String LOCK_USER_REGISTER_KEY = "short-link:lock-user-register:";
 
+    String LOCK_GROUP_CREATE_KEY = "short-link:group-create:";
+
 }

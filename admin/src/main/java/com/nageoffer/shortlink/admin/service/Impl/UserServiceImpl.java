@@ -1,6 +1,7 @@
 package com.nageoffer.shortlink.admin.service.Impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -26,6 +27,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -107,9 +109,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             throw new ClientException("用户名或密码错误");
         }
         String key = "login_" + requestParam.getUsername();
-        Boolean hasLogin = stringRedisTemplate.hasKey(key);
-        if(hasLogin != null && hasLogin) {
-            throw new ClientException("用户已经登录");
+        Map<Object, Object> loginMap = stringRedisTemplate.opsForHash().entries(key);
+        // 允许多端登录
+        if(CollUtil.isNotEmpty(loginMap)) {
+            String token = loginMap.keySet().stream()
+                    .map(Object::toString)
+                    .findFirst()
+                    .orElseThrow(() -> new ClientException("用户登录错误"));
+            return new UserLoginRespDTO(token);
         }
         String uuid = UUID.randomUUID().toString();
         stringRedisTemplate.opsForHash().put(key,uuid,JSON.toJSONString(userDO));

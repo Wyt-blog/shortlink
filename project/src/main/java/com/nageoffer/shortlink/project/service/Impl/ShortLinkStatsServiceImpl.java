@@ -276,8 +276,6 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
         if (CollUtil.isEmpty(listStatsByGroup)) {
             return null;
         }
-        // 基础访问数据
-        ShortLinkAccessStatsDO pvUvUidStatsByGroup = shortLinkAccessLogsMapper.findPvUvUidStatsByGroup(requestParam);
         // 基础访问详情
         List<ShortLinkStatsAccessDailyRespDTO> daily = new ArrayList<>();
         List<String> rangeDates = DateUtil.rangeToList(DateUtil.parse(requestParam.getStartDate()), DateUtil.parse(requestParam.getEndDate()), DateField.DAY_OF_MONTH).stream()
@@ -303,6 +301,10 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                             .build();
                     daily.add(accessDailyRespDTO);
                 }));
+        // 基础访问数据
+        int pvSum = daily.stream().mapToInt(ShortLinkStatsAccessDailyRespDTO::getPv).sum();
+        int uvSum = daily.stream().mapToInt(ShortLinkStatsAccessDailyRespDTO::getUv).sum();
+        int uipSum = daily.stream().mapToInt(ShortLinkStatsAccessDailyRespDTO::getUip).sum();
         // 地区访问详情（仅国内）
         List<ShortLinkStatsLocaleCNRespDTO> localeCnStats = new ArrayList<>();
         List<ShortLinkLocaleStatsDO> listedLocaleByGroup = shortLinkLocaleStatsMapper.listLocaleByGroup(requestParam);
@@ -418,9 +420,9 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
             networkStats.add(networkRespDTO);
         });
         return ShortLinkStatsRespDTO.builder()
-                .pv(pvUvUidStatsByGroup.getPv())
-                .uv(pvUvUidStatsByGroup.getUv())
-                .uip(pvUvUidStatsByGroup.getUip())
+                .pv(pvSum)
+                .uv(uvSum)
+                .uip(uipSum)
                 .daily(daily)
                 .localeCnStats(localeCnStats)
                 .hourStats(hourStats)
@@ -445,6 +447,9 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
         List<String> userAccessLogsList = actualResult.getRecords().stream()
                 .map(ShortLinkStatsAccessRespDTO::getUser)
                 .toList();
+        if(CollUtil.isEmpty(userAccessLogsList)) {
+            return actualResult;
+        }
         List<Map<String, Object>> uvTypeList = shortLinkAccessLogsMapper.selectGroupUvTypeByUsers(
                 requestParam.getGid(),
                 requestParam.getStartDate(),

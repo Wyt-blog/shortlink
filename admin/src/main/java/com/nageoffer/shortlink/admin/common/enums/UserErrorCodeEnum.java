@@ -13,7 +13,9 @@ public enum UserErrorCodeEnum implements IErrorCode {
 
     USER_EXITS("B000202","用户记录已存在"),
 
-    USER_SAVE_ERROR("B000203","用户记录新增失败");
+    USER_SAVE_ERROR("B000203","用户记录新增失败"),
+
+    FLOW_LIMIT_ERROR("A000300","当前系统繁忙请稍后再试");
 
     private final String code;
 
