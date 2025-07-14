@@ -1,6 +1,6 @@
 package com.nageoffer.shortlink.admin.controller;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.nageoffer.shortlink.admin.remote.dto.ShortLinkRemoteService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.nageoffer.shortlink.admin.remote.ShortLinkFeginRemoteService;
 import com.nageoffer.shortlink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
 import com.nageoffer.shortlink.admin.remote.dto.req.RecycleBinRemoveReqDTO;
 import com.nageoffer.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class RecycleBinController {
 
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService(){};
+    final ShortLinkFeginRemoteService shortLinkFeginRemoteService;
 
     final RecycleBinService recycleBinService;
 
@@ -25,14 +25,14 @@ public class RecycleBinController {
      */
     @PostMapping("save")
     public Result<Void> saveRecycleBin(@RequestBody RecycleBinSaveReqDTO requestParam) {
-        return shortLinkRemoteService.saveRecycleBin(requestParam);
+        return shortLinkFeginRemoteService.saveRecycleBin(requestParam);
     }
 
     /**
      * 分页查询回收站短连接
      */
     @GetMapping("page")
-    public Result<IPage<ShortLinkPageRespDTO>> pageRecycleBin(ShortLinkPageReqDTO requestParam) {
+    public Result<Page<ShortLinkPageRespDTO>> pageRecycleBin(ShortLinkPageReqDTO requestParam) {
         return recycleBinService.pageRecycleBin(requestParam);
     }
 
@@ -41,7 +41,7 @@ public class RecycleBinController {
      */
     @PostMapping("recover")
     public Result<Void> recoverRecycleBin(@RequestBody RecycleBinRecoverReqDTO requestParam){
-        return shortLinkRemoteService.recoverRecycleBin(requestParam);
+        return shortLinkFeginRemoteService.recoverRecycleBin(requestParam);
     }
 
     /**
@@ -49,7 +49,7 @@ public class RecycleBinController {
      */
     @PostMapping("remove")
     public Result<Void> removeRecycleBin(@RequestBody RecycleBinRemoveReqDTO requestParam){
-        return shortLinkRemoteService.removeRecycleBin(requestParam);
+        return shortLinkFeginRemoteService.removeRecycleBin(requestParam);
     }
 
 

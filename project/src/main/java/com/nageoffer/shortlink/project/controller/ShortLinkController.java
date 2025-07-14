@@ -54,7 +54,7 @@ public class ShortLinkController {
     }
 
     /**
-     * 查询短连接geshu
+     * 查询短连接个数
      */
     @GetMapping("count")
     public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam){

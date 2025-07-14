@@ -14,7 +14,7 @@ import com.nageoffer.shortlink.admin.dao.mapper.GroupMapper;
 import com.nageoffer.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
 import com.nageoffer.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import com.nageoffer.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
-import com.nageoffer.shortlink.admin.remote.dto.ShortLinkRemoteService;
+import com.nageoffer.shortlink.admin.remote.ShortLinkFeginRemoteService;
 import com.nageoffer.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import com.nageoffer.shortlink.admin.service.GroupService;
 import com.nageoffer.shortlink.admin.toolkit.RandomCodeGenerator;
@@ -38,9 +38,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GroupServiceImpl extends ServiceImpl<GroupMapper,GroupDO> implements GroupService {
 
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService(){};
-
     final RedissonClient redisson;
+
+    final ShortLinkFeginRemoteService shortLinkFeginRemoteService;
 
     @Value("${shortlink.group.create.max}")
     private int groupCreateMax;
@@ -88,7 +88,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper,GroupDO> implement
         List<GroupDO> groupDOS = baseMapper.selectList(wrapper);
         List<String> gids = groupDOS.stream().map(GroupDO::getGid).toList();
         List<ShortLinkGroupRespDTO> shortLinkGroupRespDTOS = BeanUtil.copyToList(groupDOS, ShortLinkGroupRespDTO.class);
-        Result<List<ShortLinkGroupCountQueryRespDTO>> respDTOResult = shortLinkRemoteService.listGroupShortLinkCount(gids);
+        Result<List<ShortLinkGroupCountQueryRespDTO>> respDTOResult = shortLinkFeginRemoteService.listGroupShortLinkCount(gids);
         Map<String, Long> map = respDTOResult.getData().stream().collect(Collectors.toMap(ShortLinkGroupCountQueryRespDTO::getGid, ShortLinkGroupCountQueryRespDTO::getShortLinkCount));
         shortLinkGroupRespDTOS.forEach(shortLinkGroupRespDTO -> {
             shortLinkGroupRespDTO.setShortLinkCount(map.get(shortLinkGroupRespDTO.getGid()));

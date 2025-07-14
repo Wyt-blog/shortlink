@@ -40,9 +40,11 @@ public class UserFlowRiskControlFilter implements Filter {
         }catch (Throwable e){
             log.error("用户限流拦截器异常",e);
             returnJson((HttpServletResponse) servletResponse, JSON.toJSONString(Results.failure(new ClientException(UserErrorCodeEnum.FLOW_LIMIT_ERROR))));
+            return;
         }
         if (result == null || result > maxAccessCount){
             returnJson((HttpServletResponse) servletResponse, JSON.toJSONString(Results.failure(new ClientException(UserErrorCodeEnum.FLOW_LIMIT_ERROR))));
+            return;
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }

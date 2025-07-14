@@ -1,6 +1,6 @@
 package com.nageoffer.shortlink.admin.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.nageoffer.shortlink.admin.common.convention.result.Result;
 import com.nageoffer.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import com.nageoffer.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
@@ -14,5 +14,5 @@ public interface RecycleBinService {
      * @param requestParam 查询参数
      * @return 返回参数
      */
-    Result<IPage<ShortLinkPageRespDTO>> pageRecycleBin(ShortLinkPageReqDTO requestParam);
+    Result<Page<ShortLinkPageRespDTO>> pageRecycleBin(ShortLinkPageReqDTO requestParam);
 }

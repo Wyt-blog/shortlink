@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.nageoffer.shortlink.admin.common.biz.user.UserContext;
 import com.nageoffer.shortlink.admin.common.constants.RedisCacheConstants;
 import com.nageoffer.shortlink.admin.common.convention.exception.ClientException;
 import com.nageoffer.shortlink.admin.common.enums.UserErrorCodeEnum;
@@ -92,7 +93,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
     @Override
     public void update(UserUpdateReqDTO requestParam) {
-        // TODO 验证当前登录用户是否为要修改的用户
+        if(!requestParam.getUsername().equals(UserContext.getUsername())) {
+            throw new ClientException("禁止修改他人用户信息");
+        }
         LambdaUpdateWrapper<UserDO> wrapper = Wrappers.lambdaUpdate(UserDO.class)
                 .eq(UserDO::getUsername,requestParam.getUsername());
         baseMapper.update(BeanUtil.toBean(requestParam,UserDO.class), wrapper);
@@ -108,7 +111,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         if(userDO == null) {
             throw new ClientException("用户名或密码错误");
         }
-        String key = "login_" + requestParam.getUsername();
+        String key = "short-link:login:" + requestParam.getUsername();
         Map<Object, Object> loginMap = stringRedisTemplate.opsForHash().entries(key);
         // 允许多端登录
         if(CollUtil.isNotEmpty(loginMap)) {
@@ -120,7 +123,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         }
         String uuid = UUID.randomUUID().toString();
         stringRedisTemplate.opsForHash().put(key,uuid,JSON.toJSONString(userDO));
-        stringRedisTemplate.expire(key,30,TimeUnit.DAYS);
+        stringRedisTemplate.expire(key,2,TimeUnit.HOURS);
         return new UserLoginRespDTO(uuid);
     }
 
